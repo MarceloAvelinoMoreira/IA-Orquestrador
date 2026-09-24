@@ -12,9 +12,11 @@ from .engine import OrchestrationEngine
 from .providers import OllamaProvider
 from .schemas import AgentResponse, OrchestrationRequest, TaskCreate, TaskResponse
 from .tasks import TaskManager
+from integrations.alexa import router as alexa_router
 
 app = FastAPI(title=settings.app_name, version="0.1.0")
 engine = OrchestrationEngine()
+app.include_router(alexa_router)
 
 # Serve the compiled browser interface when the project is run as a desktop
 # application. In development, Vite continues to serve the frontend itself.
@@ -55,7 +57,7 @@ def health() -> dict:
     provider = OllamaProvider()
     reachable = provider.health()
     agents_state = {a.name: a.status.lower() for a in engine.registry.all()} | {n: "not_configured" for n in ("gemini", "cursor")}
-    return {"status": "ok" if reachable else "degraded", "service": settings.app_name, "database": "ok", "ollama": "ok" if reachable else "offline", "local_model": {"name": provider.model, "status": "available" if reachable else "unavailable"}, "agents": agents_state, "codex": {"status": engine.codex.status.lower(), "version": engine.codex.version}, "claude": {"status": engine.claude.status.lower(), "version": engine.claude.version}}
+    return {"status": "ok" if reachable else "degraded", "service": settings.app_name, "database": "ok", "ollama": "ok" if reachable else "offline", "local_model": {"name": provider.model, "status": "available" if reachable else "unavailable"}, "agents": agents_state, "codex": {"status": engine.codex.status.lower(), "version": engine.codex.version}, "claude": {"status": engine.claude.status.lower(), "version": engine.claude.version}, "alexa": {"status": "ready" if settings.alexa_enabled else "disabled", "verification_required": settings.alexa_require_verification}}
 
 
 @app.get("/agents", response_model=list[AgentResponse])

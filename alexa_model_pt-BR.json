@@ -1,0 +1,18 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "marcelo ia",
+      "intents": [
+        {"name":"AMAZON.CancelIntent","samples":[]},
+        {"name":"AMAZON.HelpIntent","samples":[]},
+        {"name":"AMAZON.StopIntent","samples":[]},
+        {"name":"AMAZON.FallbackIntent","samples":[]},
+        {"name":"AskAIIntent","slots":[{"name":"query","type":"AMAZON.SearchQuery"}],"samples":["pergunte {query}","explique {query}","quero saber {query}","me diga {query}","consulte {query}","verifique {query}","execute {query}","mande para o chat gpt {query}","use o modelo local para {query}"]},
+        {"name":"SystemStatusIntent","samples":["qual o status do sistema","verifique o status do servidor","quais agentes estão disponíveis"]},
+        {"name":"TaskStatusIntent","samples":["quais tarefas estão sendo executadas","existem tarefas em execução"]},
+        {"name":"LastResultIntent","samples":["qual foi o resultado da última tarefa","qual foi a última tarefa"]}
+      ],
+      "types": []
+    }
+  }
+}

@@ -15,6 +15,13 @@ class Settings(BaseSettings):
     health_cache_seconds: int = 30
     project_context_cache_seconds: int = 15
     allow_commands: bool = False
+    alexa_enabled: bool = True
+    alexa_require_verification: bool = False
+    alexa_skill_id: str = ""
+    alexa_max_response_length: int = 7500
+    alexa_request_timeout: int = 8
+    alexa_allowed_user_ids: str = ""
+    alexa_rate_limit_per_minute: int = 30
     workspace: Path = Path.cwd()
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
