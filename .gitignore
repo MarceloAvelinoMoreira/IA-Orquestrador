@@ -1,4 +1,6 @@
 .venv/
+frontend/node_modules/
+frontend/tsconfig.tsbuildinfo
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -7,3 +9,7 @@ __pycache__/
 *.err
 .env
 
+# Generated desktop build
+build/
+dist/
+*.spec

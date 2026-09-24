@@ -1,5 +1,10 @@
+import sys
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from .config import settings
 from .db import get_db, init_db
@@ -11,6 +16,11 @@ from .tasks import TaskManager
 app = FastAPI(title=settings.app_name, version="0.1.0")
 engine = OrchestrationEngine()
 
+# Serve the compiled browser interface when the project is run as a desktop
+# application. In development, Vite continues to serve the frontend itself.
+_runtime_root = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1]))
+_frontend_dist = _runtime_root / "frontend" / "dist"
+
 # The Vite development server runs on a separate origin during local use.
 # Keep this limited to local development hosts; production deployments should
 # replace it with their explicit frontend origin.
@@ -21,6 +31,18 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type"],
 )
+
+if _frontend_dist.exists():
+    _frontend_assets = _frontend_dist / "assets"
+    if _frontend_assets.exists():
+        app.mount("/assets", StaticFiles(directory=_frontend_assets), name="frontend-assets")
+    _frontend_source = _frontend_dist / "src"
+    if _frontend_source.exists():
+        app.mount("/src", StaticFiles(directory=_frontend_source), name="frontend-source")
+
+    @app.get("/", include_in_schema=False)
+    def frontend_index():
+        return FileResponse(_frontend_dist / "index.html")
 
 
 @app.on_event("startup")
