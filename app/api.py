@@ -29,6 +29,7 @@ def startup() -> None: init_db()
 
 @app.get("/health")
 def health() -> dict:
+    engine.refresh_agent_health()
     provider = OllamaProvider()
     reachable = provider.health()
     agents_state = {a.name: a.status.lower() for a in engine.registry.all()} | {n: "not_configured" for n in ("gemini", "cursor")}

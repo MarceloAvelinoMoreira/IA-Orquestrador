@@ -1,4 +1,4 @@
-from app.capabilities import normalize_capability, normalize_capabilities
+from app.capabilities import normalize_capability, normalize_capabilities, infer_capabilities
 from app.agents import AgentRegistry, MockAgent
 from app.claude_agent import ClaudeAgent
 from app.codex_agent import CodexAgent
@@ -9,6 +9,7 @@ def test_capability_aliases_and_unknown():
     assert normalize_capability("unit_tests") == "TESTING"
     assert normalize_capability("implementation") == "CODING"
     assert normalize_capability("something_new") == "UNKNOWN"
+    assert "DEBUGGING" in infer_capabilities("investigue a causa raiz do erro")
 
 
 def test_router_scores_codex_and_claude():

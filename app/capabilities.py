@@ -15,3 +15,9 @@ def normalize_capabilities(values: list[str]) -> tuple[list[str], list[str]]:
         if result == "UNKNOWN": unknown.append(value)
         elif result not in normalized: normalized.append(result)
     return normalized, unknown
+
+
+def infer_capabilities(text: str) -> list[str]:
+    lowered = text.lower()
+    rules = {"DEBUGGING": ("debug", "falha", "erro", "investigue", "causa raiz"), "TESTING": ("teste", "testes", "pytest"), "CODING": ("implemente", "crie", "função", "endpoint", "código"), "ARCHITECTURE": ("arquitetura", "design"), "TERMINAL": ("comando", "terminal", "shell"), "DOCUMENTATION": ("documentação", "readme")}
+    return [capability for capability, keywords in rules.items() if any(keyword in lowered for keyword in keywords)]

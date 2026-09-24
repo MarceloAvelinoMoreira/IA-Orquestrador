@@ -24,16 +24,22 @@ class OrchestrationEngine:
     def __init__(self, registry: AgentRegistry | None = None, provider: OllamaProvider | None = None):
         self.registry = registry or AgentRegistry(); self.registry.register(MockAgent())
         self.codex = CodexAgent()
-        self.codex.health_check()
         self.registry.register(self.codex)
         self.claude = ClaudeAgent(timeout=settings.claude_timeout_seconds)
-        self.claude.health_check()
+        self._health_checked_at = 0.0
         self.registry.register(self.claude)
         self.router = Router(self.registry); self.provider = provider or OllamaProvider()
+
+    def refresh_agent_health(self) -> None:
+        if time.time() - self._health_checked_at < settings.health_cache_seconds: return
+        self.codex.health_check()
+        self.claude.health_check()
+        self._health_checked_at = time.time()
 
     def execute(self, request: OrchestrationRequest, db: Session | None = None, use_ollama: bool = True) -> dict:
         text = request.text
         execution_id = f"EXEC-{uuid4().hex[:10]}"
+        if request.execution_mode == "external": self.refresh_agent_health()
         context = ProjectInspector(settings.workspace).inspect()
         analysis = self.provider.structured(analysis_prompt(text, context.model_dump_json()), RequestAnalysis, retries=1) if use_ollama else RequestAnalysis(summary=text, goal=text, requirements=[text])
         plan = self.provider.structured(planning_prompt(analysis.model_dump_json(), context.model_dump_json()), PlanningOutput, retries=1) if use_ollama else PlanningOutput(

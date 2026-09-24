@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     codex_timeout_seconds: int = 180
     codex_enabled: bool = True
     claude_timeout_seconds: int = 180
+    health_cache_seconds: int = 30
+    project_context_cache_seconds: int = 15
     allow_commands: bool = False
     workspace: Path = Path.cwd()
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

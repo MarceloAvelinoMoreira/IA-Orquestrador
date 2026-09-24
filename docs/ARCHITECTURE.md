@@ -9,3 +9,5 @@ No Milestone 2, `OrchestrationEngine` coordena `ProjectInspector`, `RequestAnaly
 Milestone 3A adiciona `CodexAgent` real, opt-in, com TaskPacket, subprocesso seguro, sandbox workspace-write, timeout separado, captura JSONL e escopo explícito. `MockAgent` continua padrão para testes e fallback.
 
 Claude Code é descoberto por candidatos do PATH/launcher/pnpm store e validado por execução de `--version`; o launcher incompatível é rejeitado. `ClaudeAgent` usa execução restrita e permanece sujeito à disponibilidade real de créditos.
+
+As otimizações atuais reutilizam o cliente HTTP do Ollama, cacheiam health checks por curto período e cacheiam o `ProjectContext` compacto. O Router normaliza aliases canônicos e infere capabilities apenas por regras explícitas e determinísticas, evitando dependência adicional do LLM para decisões simples.

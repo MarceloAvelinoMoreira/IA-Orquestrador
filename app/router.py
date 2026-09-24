@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from .agents import AgentRegistry, BaseAgent
 from .structured import RoutingDecision
-from .capabilities import normalize_capabilities
+from .capabilities import normalize_capabilities, infer_capabilities
 
 
 @dataclass
@@ -33,6 +33,8 @@ class Router:
     def route_task(self, task_id: str, required_capabilities: list[str], description: str = "") -> RoutingDecision:
         ranked = []
         normalized, unknown = normalize_capabilities(required_capabilities)
+        if not normalized and description:
+            normalized, inferred_unknown = normalize_capabilities(infer_capabilities(description)); unknown.extend(inferred_unknown)
         required = set(normalized)
         for agent in self.registry.all():
             agent_capabilities, _ = normalize_capabilities(list(agent.capabilities))

@@ -1,14 +1,19 @@
 from pathlib import Path
 from .structured import ProjectContext
+import time
 
 
 class ProjectInspector:
     EXCLUDED = {".venv", ".git", "__pycache__", "node_modules", "dist", "build", ".pytest_cache"}
     IMPORTANT = {"README.md", "requirements.txt", "pyproject.toml", "package.json", "Dockerfile", "main.py"}
 
+    _cache: dict[str, tuple[float, ProjectContext]] = {}
+
     def __init__(self, root: str | Path, max_files: int = 80): self.root = Path(root).resolve(); self.max_files = max_files
 
     def inspect(self) -> ProjectContext:
+        cached = self._cache.get(str(self.root))
+        if cached and time.time() - cached[0] < 15: return cached[1]
         files = []
         for path in self.root.rglob("*"):
             if len(files) >= self.max_files or not path.is_file() or any(part in self.EXCLUDED for part in path.parts): continue
@@ -18,5 +23,6 @@ class ProjectInspector:
         tests = sorted({str(Path(f).parent).replace(".", "") or "." for f in files if "test" in Path(f).name.lower() or "tests" in Path(f).parts})
         configs = [f for f in files if Path(f).suffix in {".toml", ".json", ".yml", ".yaml"} or Path(f).name == "requirements.txt"]
         builds = [f for f in files if Path(f).name in {"pyproject.toml", "setup.py", "Dockerfile", "package.json"}]
-        return ProjectContext(root=str(self.root), languages=languages, frameworks=["FastAPI", "SQLAlchemy"], important_files=important, configuration=configs, test_directories=tests, build_files=builds, git_state="UNVERIFIED: repository not initialized")
-
+        result = ProjectContext(root=str(self.root), languages=languages, frameworks=["FastAPI", "SQLAlchemy"], important_files=important, configuration=configs, test_directories=tests, build_files=builds, git_state="UNVERIFIED: repository not initialized")
+        self._cache[str(self.root)] = (time.time(), result)
+        return result

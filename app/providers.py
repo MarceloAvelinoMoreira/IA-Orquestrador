@@ -17,10 +17,11 @@ class OllamaProvider:
         self.timeout = timeout
         self.logger = logging.getLogger("ia_orquestrador.ollama")
         self.last_metrics: dict[str, Any] = {}
+        self._client = httpx.Client(timeout=httpx.Timeout(connect=5, read=self.timeout, write=10, pool=5))
 
     def health(self) -> bool:
         try:
-            response = httpx.get(f"{self.base_url}/api/tags", timeout=5)
+            response = self._client.get(f"{self.base_url}/api/tags", timeout=5)
             return response.is_success
         except httpx.HTTPError:
             return False
@@ -34,7 +35,7 @@ class OllamaProvider:
         try:
             payload = {"model": self.model, "messages": messages, "stream": False, "think": False, "options": {"num_predict": 384}}
             if response_format: payload["format"] = response_format
-            response = httpx.post(f"{self.base_url}/api/chat", json=payload, timeout=self.timeout)
+            response = self._client.post(f"{self.base_url}/api/chat", json=payload)
             response.raise_for_status()
             data: dict[str, Any] = response.json()
             message = data.get("message", {})

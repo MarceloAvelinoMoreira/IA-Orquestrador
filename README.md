@@ -20,6 +20,14 @@ Configuração opcional via `.env`: `OLLAMA_URL`, `OLLAMA_MODEL`, `DATABASE_URL`
 
 O fluxo detalhado está em `docs/MILESTONE_2.md`.
 
+## Performance e inteligência
+
+- Conexão HTTP persistente com Ollama para reduzir overhead entre chamadas.
+- Cache curto de health checks dos agentes externos.
+- Cache curto do contexto compacto do projeto.
+- Normalização e inferência determinística de capabilities quando o Qwen usa aliases ou termos de domínio.
+- Execução externa continua opt-in; o modo padrão permanece `mock`.
+
 Codex externo é opt-in com `execution_mode=external`; o padrão conservador é `mock`. Consulte `docs/MILESTONE_3_CODEX.md`.
 
 Claude Code foi encontrado dinamicamente no pnpm store, validado como versão 2.1.270 e autenticado. A execução real está bloqueada atualmente por `Credit balance is too low`. Consulte `docs/MILESTONE_3_CLAUDE.md`.
